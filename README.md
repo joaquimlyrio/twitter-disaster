@@ -9,3 +9,5 @@ There is one notebook for each type of feature extraction method, such as:
  followed by different classification models.
 
 All the code can be found under `/src`.
+
+Additionally, a simple example of deployment of a pipeline using FastAPI and Docker can be found under `/src/app`.
