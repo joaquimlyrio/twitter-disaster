@@ -8,7 +8,7 @@ from pydantic import BaseModel
 app = FastAPI()
 
 class TweetIn(BaseModel):
-    tweet: str
+    tweet: list #str
 
 class TweetPredict(TweetIn):
     pred: dict
@@ -26,16 +26,13 @@ async def root():
 def return_pipeline():
     return {'pipeline':str(model)}
 
-# Obs: as of now, this method predicts only one string at a time
-# TODO: make it possible for multiple tweets
 @app.post('/predict')
-def predict(dict_tweet: TweetIn):
-    tweet_list = list()
-    tweet_list.append(dict_tweet.tweet)
-    pred = model.predict_proba(pd.Series(tweet_list))[:,1]
-    response_object = {'tweet':dict_tweet.tweet, 'probability':str(pred)}
-    return response_object
-
+def predict_multiple(data: TweetIn):    
+    dt = pd.DataFrame({'tweet':data.tweet})
+    dt['prob'] = model.predict_proba(dt['tweet'])[:,1]
+    dt = dt.set_index('tweet')
+    return dt.to_dict()
+    
 ## TO run: uvicorn model_serve:app --reload
 import uvicorn
 if __name__=="__main__":
